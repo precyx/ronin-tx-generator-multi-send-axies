@@ -12,8 +12,9 @@
     let loading = false;
 
     // blockchain
-    let provider;
-    let wallet;
+    let CHAIN_ID = 2020;
+    let provider:ethers.providers.JsonRpcProvider;
+    let wallet:ethers.Wallet;
 
     // user
     let mnemonic:string = "";
@@ -57,11 +58,11 @@
 
     const setupProvider = () => {
         // get provider
-        //provider = new ethers.providers.JsonRpcProvider("https://proxy.roninchain.com/free-gas-rpc", 2020);
-        provider = new ethers.providers.JsonRpcProvider("https://api.roninchain.com/rpc", 2021);
+        provider = new ethers.providers.JsonRpcProvider("https://proxy.roninchain.com/free-gas-rpc", CHAIN_ID);
+        //provider = new ethers.providers.JsonRpcProvider("https://api.roninchain.com/rpc", 2021);
 
         // get wallet from mnemonic
-        let account_path = `m/44'/60'/0'/0/${1}`;
+        let account_path = `m/44'/60'/0'/0/${0}`;
         wallet = ethers.Wallet.fromMnemonic(mnemonic, account_path)
         wallet = wallet.connect(provider);
     }
@@ -88,6 +89,8 @@
         let toRoninAddresses = to_ronin.split(N).map(x => x.replace("ronin:", "0x"));
         let tokenIds = axie_id.split(N).map(x => parseInt(x.replace(/[^0-9]/g, '') ));
 
+        // get tx count
+        let tx_count = await wallet.getTransactionCount();
 
         completed_txs = 0;
         total_txs = toRoninAddresses.length;
@@ -106,10 +109,10 @@
             // create transaction
             let tx = await AxieContract.populateTransaction.safeTransferFrom(fromRoninAddress, _ronin_address, _token_id);
 
-            // set gas limit
-            tx.value = utils.parseEther(0 + "");
-            tx.gasPrice = utils.parseUnits(0 + "", "gwei");
+            // set gasLimit chainId and nonce
             tx.gasLimit = utils.parseUnits(450000 + "", "wei");
+            tx.chainId = CHAIN_ID;
+            tx.nonce = tx_count + i;
             
             // sign transaction
             let signedTx = await wallet.signTransaction(tx);
