@@ -1,6 +1,6 @@
 <script lang="ts">
     import {onMount} from "svelte";
-    import { ethers } from "ethers";
+    import { ethers, utils } from "ethers";
     import {Axie_ABI} from "../data/Axie_ABI.svelte";
     import {asyncForEach, sleep} from "../utils/Utils.svelte";
 
@@ -105,6 +105,11 @@
             
             // create transaction
             let tx = await AxieContract.populateTransaction.safeTransferFrom(fromRoninAddress, _ronin_address, _token_id);
+
+            // set gas limit
+            tx.value = utils.parseEther(0 + "");
+            tx.gasPrice = utils.parseUnits(0 + "", "gwei");
+            tx.gasLimit = utils.parseUnits(450000 + "", "wei");
             
             // sign transaction
             let signedTx = await wallet.signTransaction(tx);
