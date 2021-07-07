@@ -132,7 +132,7 @@
 
     <div class="box warning">
         This tool is strongly recommended to be used in <b>Incognito mode</b> and <b>Offline</b>.
-        <br> Source Code is public on github: <a target="_blank" href="https://github.com/"><b>Precyx</b></a>
+        <br> Source Code is public on github: <a target="_blank" href="https://github.com/precyx/ronin-tx-generator-multi-send-axies"><b>Precyx</b></a>
     </div>
 
     <div class="titlebar">
