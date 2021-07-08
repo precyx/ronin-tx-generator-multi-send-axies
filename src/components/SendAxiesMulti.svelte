@@ -2,7 +2,7 @@
     import {onMount} from "svelte";
     import { ethers, utils } from "ethers";
     import {Axie_ABI} from "../data/Axie_ABI.svelte";
-    import {asyncForEach, sleep} from "../utils/Utils.svelte";
+    import {asyncForEach, sleep, debounce} from "../utils/Utils.svelte";
 
     // const
     const N = `
@@ -15,10 +15,12 @@
     let CHAIN_ID = 2020;
     let provider:ethers.providers.JsonRpcProvider;
     let wallet:ethers.Wallet;
+    let public_address:string;
+
+    $: calculatePublicAddress(mnemonic);
 
     // user
     let mnemonic:string = "";
-    let from_ronin:string = ""; 
     let to_ronin:string = "";
     let axie_id:string = "";
     let signedTransactions:string = "";
@@ -41,6 +43,11 @@
     /**
      * Reactivity
      */
+    const calculatePublicAddress = (_mnemonic) => {
+        if(!_mnemonic) return;
+        debounced_SetupProvider();
+    }
+
     const calculateNumToAddresses = (_to_ronin:string) => {
         num_to_ronins = _to_ronin.split(N).length || 0;
     }
@@ -56,6 +63,8 @@
     });
 
 
+    const debounced_SetupProvider = debounce(() => setupProvider(), 900);
+
     const setupProvider = () => {
         // get provider
         provider = new ethers.providers.JsonRpcProvider("https://proxy.roninchain.com/free-gas-rpc", CHAIN_ID);
@@ -65,6 +74,9 @@
         let account_path = `m/44'/60'/0'/0/${0}`;
         wallet = ethers.Wallet.fromMnemonic(mnemonic, account_path)
         wallet = wallet.connect(provider);
+
+        // set public address
+        public_address = wallet.address.replace("0x", "ronin:");
     }
 
 
@@ -78,14 +90,14 @@
 
         setupProvider();
 
-        // create axie (ERC-721) contract
+        // create axie contract
         let Axie_Contract_Address = `0x32950db2a7164ae833121501c797d79e7b79d74c`;
         
         let AxieContract = new ethers.Contract(Axie_Contract_Address, Axie_ABI, provider);
         
         console.log("axie contract", AxieContract);
 
-        let fromRoninAddress = from_ronin.replace("ronin:", "0x");
+        let fromRoninAddress = public_address.replace("ronin:", "0x");
         let toRoninAddresses = to_ronin.split(N).map(x => x.replace("ronin:", "0x"));
         let tokenIds = axie_id.split(N).map(x => parseInt(x.replace(/[^0-9]/g, '') ));
 
@@ -156,8 +168,8 @@
                 <input type="password" bind:value={mnemonic} class="seed_input"/>
             </div>
             <div class="line">
-                <div class="label">From Ronin:</div>
-                <input type="text" bind:value={from_ronin} />
+                <div class="label">Ronin Account:</div>
+                <input type="text" bind:value={public_address} disabled={true}/>
             </div>
             <div class="line">
                 <div class="label">
@@ -178,7 +190,9 @@
                 <textarea bind:value={axie_id} />
             </div>
             <div class="center">
-                <button on:click={generateTransactions}>
+                <button on:click={generateTransactions} disabled={
+                    !public_address
+                }>
                     Generate TX
                 </button>
             </div>
@@ -272,6 +286,12 @@
     button:hover {
         background:#55a9ff;
     }
+    button:disabled {
+        background: #dddddd;
+        color: #828282;
+        user-select: none;
+        pointer-events: none;
+    }
 
     h1 {
         margin:0;
@@ -294,6 +314,10 @@
     input {
         width:100%;
         font-size:14px;
+        border-color: #7c7c7c;
+    }
+    input:disabled {
+        border-color: #d9d9d9;
     }
     .seed_input {
         width: 100%;
