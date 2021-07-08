@@ -17,8 +17,14 @@ let signedTx = await wallet.signTransaction(tx);
 
 Before using it you can test it out with the Demo seed:
 
-**Ronin Seed:**  
-`rural control flavor ability van shrimp pig garment baby clarify express submit`
+**Ronin Private Key:**  
+`0xf1533e116864a43d4fb7c4cd1ce550ec8c8dfeb4893fce57ea91296d156b9b37`
 
 **Ronin Public Address:**  
 `ronin:1743253c2ab78a7f086ab5c642da9b7970fe4fa8`
+
+---
+
+**Ronin Seed:**  
+`rural control flavor ability van shrimp pig garment baby clarify express submit`
+

@@ -17,10 +17,10 @@
     let wallet:ethers.Wallet;
     let public_address:string;
 
-    $: calculatePublicAddress(mnemonic);
+    $: calculatePublicAddress(private_key);
 
     // user
-    let mnemonic:string = "";
+    let private_key:string = "";
     let to_ronin:string = "";
     let axie_id:string = "";
     let signedTransactions:string = "";
@@ -43,8 +43,8 @@
     /**
      * Reactivity
      */
-    const calculatePublicAddress = (_mnemonic) => {
-        if(!_mnemonic) return;
+    const calculatePublicAddress = (_private_key) => {
+        if(!_private_key) return;
         debounced_SetupProvider();
     }
 
@@ -70,9 +70,8 @@
         provider = new ethers.providers.JsonRpcProvider("https://proxy.roninchain.com/free-gas-rpc", CHAIN_ID);
         //provider = new ethers.providers.JsonRpcProvider("https://api.roninchain.com/rpc", 2021);
 
-        // get wallet from mnemonic
-        let account_path = `m/44'/60'/0'/0/${0}`;
-        wallet = ethers.Wallet.fromMnemonic(mnemonic, account_path)
+        // get wallet from private_key
+        wallet = new ethers.Wallet(private_key);
         wallet = wallet.connect(provider);
 
         // set public address
@@ -82,7 +81,7 @@
 
     /**
      * Generates 'send-axie' transactions based on the input
-     * Also signs the transaction with the mnemonic
+     * Also signs the transaction with the private key
      */
     let generateTransactions = async () => {
 
@@ -164,8 +163,8 @@
 
         <div class="input">
             <div class="line">
-                <div class="label">Mnemonic:</div>
-                <input type="password" bind:value={mnemonic} class="seed_input"/>
+                <div class="label">Private Key:</div>
+                <input type="password" bind:value={private_key} class="private_key_input"/>
             </div>
             <div class="line">
                 <div class="label">Ronin Account:</div>
@@ -319,7 +318,7 @@
     input:disabled {
         border-color: #d9d9d9;
     }
-    .seed_input {
+    .private_key_input {
         width: 100%;
     }
 
