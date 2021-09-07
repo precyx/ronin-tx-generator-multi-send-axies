@@ -1,0 +1,5 @@
+Referring to your source code, the following error is returned by calling Python Web3. Do you know the cause of the problem
+
+
+Client error: `POST https://proxy.roninchain.com/free-gas-rpc` resulted in a `401 Unauthorized` response:
+"0xa551eb057e0eb0e8cad42b4ce8f1ee4cdbf6861f" is not a player
